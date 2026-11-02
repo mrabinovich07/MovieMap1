@@ -1,0 +1,7 @@
+.idea/
+cmake-build-*/
+
+data/title.basics.tsv
+data/title.crew.tsv
+data/title.ratings.tsv
+data/tags.csv
