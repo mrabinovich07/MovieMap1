@@ -12,7 +12,13 @@ add_executable(MovieMapNew main.cpp loader.cpp
         franchise.h
         tags.h
         tags.cpp
-        franchise.h)
+        search.h
+        search.cpp
+        bucketing.h
+        bucketing.cpp)
 
 #lets code find the data folder no matter where the program is run
 target_compile_definitions(MovieMapNew PRIVATE DATA_DIR="${CMAKE_SOURCE_DIR}/data/")
+
+# creates a separate run configuration just for your unit tests
+add_executable(SearchTests test.cpp catch_amalgamated.cpp search.cpp graph.cpp loader.cpp tags.cpp)

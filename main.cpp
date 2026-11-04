@@ -9,10 +9,13 @@
 #include "loader.h"
 #include "similarity.h"
 #include "tags.h"
+#include "bucketing.h"
+#include "search.h"
 
 #include <algorithm>
 #include <cctype>
 #include <numeric>
+
 std::string toLower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(),
                    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
@@ -112,5 +115,15 @@ int main() {
                   << genreString(m, data.genreNames) << "] {" << m.franchise << "} "
                   << m.tags.size() << " tags\n";
     }
+    BenchmarkResult bfsRes = runBenchmark(g, sample, root, 50, true);
+    BenchmarkResult dfsRes = runBenchmark(g, sample, root, 50, false);
+
+    std::cout << "\n--- Screen 5: BFS vs DFS Comparison ---\n";
+    std::cout << "BFS - Nodes Visited: " << bfsRes.nodesVisited
+              << ", Time: " << bfsRes.timeMicroseconds
+              << "us, Avg Sim: " << bfsRes.averageSimilarity << "\n";
+    std::cout << "DFS - Nodes Visited: " << dfsRes.nodesVisited
+              << ", Time: " << dfsRes.timeMicroseconds
+              << "us, Avg Sim: " << dfsRes.averageSimilarity << "\n";
     return 0;
 }
