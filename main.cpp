@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "graph.h"
 #include "loader.h"
@@ -125,5 +126,17 @@ int main() {
     std::cout << "DFS - Nodes Visited: " << dfsRes.nodesVisited
               << ", Time: " << dfsRes.timeMicroseconds
               << "us, Avg Sim: " << dfsRes.averageSimilarity << "\n";
+    // --- Bucketing Benchmark ---
+    auto startBucket = std::chrono::high_resolution_clock::now();
+    BucketMap buckets = buildBuckets(sample);
+    auto endBucket = std::chrono::high_resolution_clock::now();
+    auto bucketDuration = std::chrono::duration_cast<std::chrono::microseconds>(endBucket - startBucket).count();
+
+    std::string targetKey = getBucketKey(chosen);
+    int bucketSize = buckets[targetKey].size();
+
+    std::cout << "\n--- Bucketing Comparison ---\n";
+    std::cout << "Buckets Build Time: " << bucketDuration << "us\n";
+    std::cout << "Movies in same Genre/Decade bucket: " << bucketSize << "\n";
     return 0;
 }
