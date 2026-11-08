@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MovieMap · Explore movie connections</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <label for="search">SEARCH MOVIES</label>
+      <input id="search" type="search" placeholder="Search by movie title…" autocomplete="off" />
+      <div id="results" class="results" role="listbox" aria-label="Movie search results"></div>
+
+      <div class="selected-card">
+        <div class="eyebrow">SELECTED MOVIE</div>
+        <h2 id="movie-title">—</h2>
+        <div id="movie-meta" class="meta"></div>
+        <div id="movie-genres" class="pills"></div>
+        <div id="movie-details" class="details"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="top">
+        <div>
+          <div class="eyebrow">MOVIE SIMILARITY GRAPH</div>
+          <h2>Interactive graph view</h2>
+        </div>
+        <div class="top-right">
+          <span id="dataset-badge" class="badge">DEMO DATA</span>
+          <span id="count">0 movies</span>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <div class="control">
+          <label for="color">COLOR BY</label>
+          <select id="color">
+            <option value="similarity">Similarity</option>
+            <option value="rating">Rating difference</option>
+            <option value="year">Year difference</option>
+            <option value="runtime">Runtime difference</option>
+            <option value="votes">Vote count difference</option>
+          </select>
+        </div>
+        <button class="primary-btn" id="bfs" type="button">Run BFS</button>
+        <button class="primary-btn alt" id="dfs" type="button">Run DFS</button>
+      </section>
+
+      <section class="graph-panel">
+        <div class="graph-hint">Click a node to change the selected movie. Scroll to zoom and drag to pan.</div>
+        <svg id="graph" viewBox="0 0 900 540" role="img" aria-label="Interactive movie similarity graph">
+          <g id="viewport">
+            <g id="links"></g>
+            <g id="nodes"></g>
+          </g>
+        </svg>
+      </section>
+
+      <section class="status-strip" aria-live="polite">
+        <div class="stat-inline"><span class="status-label">Search time</span><strong id="stat-time">—</strong></div>
+        <div class="stat-inline"><span class="status-label">Average root similarity</span><strong id="stat-sim">—</strong></div>
+        <div class="status-progress"><span class="status-label">Traversal</span><div id="progress" class="progress-text">Select BFS or DFS to begin.</div></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="graph-data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

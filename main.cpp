@@ -12,6 +12,7 @@
 #include "tags.h"
 #include "bucketing.h"
 #include "search.h"
+#include "export.h"
 
 #include <algorithm>
 #include <cctype>
@@ -53,20 +54,37 @@ std::string genreString(const Movie& m, const std::vector<std::string>& names) {
     return out;
 }
 
-int main() {
+int main(int argc, char** argv) {
+    const bool exportMode = argc >= 3 && std::string(argv[1]) == "--export";
+    if (argc > 1 && !exportMode) {
+        std::cerr << "Usage: " << argv[0] << " [--export frontend/graph.json [movie title]]\n";
+        return 1;
+    }
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
 #endif
     const std::string dir = DATA_DIR;
     Dataset data = loadMovies(dir + "title.basics.tsv", dir + "title.ratings.tsv", dir + "title.crew.tsv", 100);
     std::cout << "Loaded " << data.movies.size() << " movies\n";
+    if (data.movies.empty()) {
+        std::cerr << "No movies loaded. Place IMDb TSV files in data/.\n";
+        return 1;
+    }
 
     size_t tagged = attachTags(data, dir + "links.csv", dir + "tags.csv", 5);
     std::cout << tagged << " movies have tags (" << data.tagNames.size() << " distinct tags kept)\n";
 
-    std::cout << "Enter a movie title to search: ";
     std::string query;
-    std::getline(std::cin, query);
+    if (exportMode) {
+        for (int i = 3; i < argc; ++i) {
+            if (!query.empty()) query += " ";
+            query += argv[i];
+        }
+        if (query.empty()) query = data.movies.front().title;
+    } else {
+        std::cout << "Enter a movie title to search: ";
+        std::getline(std::cin, query);
+    }
     int found = findMovie(data.movies, query);
     if (found == -1) {
         std::cout << "No movie matches \"" << query << "\"\n";
@@ -103,6 +121,14 @@ int main() {
     std::cout << "Pool size: " << sample.size() << " (" << poolTagged << " with tags)\n";
 
     Graph g = buildGraph(sample, 15);
+    if (exportMode) {
+        if (!exportGraphJson(argv[2], sample, data.genreNames, g, root)) {
+            std::cerr << "Could not write JSON to " << argv[2] << "\n";
+            return 1;
+        }
+        std::cout << "Exported " << sample.size() << " movies and C++ searches/benchmarks to " << argv[2] << "\n";
+        return 0;
+    }
 
     const Movie& r = sample[root];
     std::cout << "\nRoot: " << r.title << " (" << r.year << ") "
